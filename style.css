@@ -1,12 +1,22 @@
-/* [Vos styles existants inchangés] */
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-/* Ajouts pour l'archivage */
+/* [Tous vos styles existants] */
+
+/* Styles ajoutés pour l'archivage */
 .view-archives-btn {
     background-color: #607d8b;
     color: white;
     margin: 20px auto;
     display: block;
     padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .archives-container {
@@ -27,6 +37,7 @@
     background-color: #4caf50 !important;
     color: white !important;
     padding: 8px 12px !important;
+    margin-left: 10px;
 }
 
 .archives-container h2 button {
@@ -37,4 +48,5 @@
     padding: 5px 10px;
     border-radius: 3px;
     cursor: pointer;
+    font-size: 14px;
 }
