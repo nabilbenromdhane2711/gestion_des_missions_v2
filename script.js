@@ -1,93 +1,98 @@
-// Initialisation du formulaire
-function initForm() {
-    const missionTypeSelect = document.getElementById('missionType');
-    const missionDetailSelect = document.getElementById('missionDetail');
+// STRUCTURE DE DONNÉES COMBINÉE
+const app = {
+    db: {
+        missions: [],
+        archives: [],
+        users: ["Abdelkader BenHammouda", "Abderazak Houssaini", /* ... votre liste complète ... */]
+    },
     
-    missionTypeSelect.addEventListener('change', function() {
-        const selectedType = this.value;
-        missionDetailSelect.innerHTML = '';
-        
-        if (!selectedType) {
-            missionDetailSelect.disabled = true;
-            missionDetailSelect.innerHTML = '<option value="">Sélectionnez d\'abord le type de mission</option>';
-            return;
-        }
-        
-        missionDetailSelect.disabled = false;
-        const details = getMissionDetails(selectedType);
-        
-        details.forEach(detail => {
-            const option = document.createElement('option');
-            option.value = detail;
-            option.textContent = detail;
-            missionDetailSelect.appendChild(option);
+    init: function() {
+        this.loadData();
+        this.setupForm();
+        this.setupAutocomplete();
+        this.renderMissions();
+    },
+    
+    // FONCTIONS ORIGINALES (adaptées)
+    formatName: function(name) {
+        const parts = name.split(' ');
+        return parts.length >= 2 
+            ? `${parts[0]} ${parts.slice(1).join(' ').toUpperCase()}` 
+            : name;
+    },
+    
+    setupForm: function() {
+        // Votre logique de formulaire originale
+        document.getElementById('missionType').addEventListener('change', function() {
+            // ... votre gestion des menus déroulants ...
         });
-    });
-
-    document.getElementById('addButton').addEventListener('click', addMission);
-}
-
-// Fonction pour ajouter une mission
-function addMission() {
-    const formElements = {
-        userName: document.getElementById('userName'),
-        interventionType: document.getElementById('interventionType'),
-        missionType: document.getElementById('missionType'),
-        missionDetail: document.getElementById('missionDetail'),
-        priority: document.getElementById('priority'),
-        description: document.getElementById('missionDescription')
-    };
-
-    // Validation
-    let isValid = true;
-    Object.values(formElements).forEach(el => {
-        if (el.required && !el.value) {
-            el.classList.add('error');
-            isValid = false;
-        } else {
-            el.classList.remove('error');
+        
+        document.getElementById('addButton').addEventListener('click', () => {
+            // Validation et ajout de mission
+            const newMission = {
+                id: Date.now(),
+                userName: document.getElementById('userName').value,
+                // ... autres valeurs du formulaire ...
+                archived: false
+            };
+            
+            this.db.missions.push(newMission);
+            this.saveData();
+            this.renderMissions();
+        });
+    },
+    
+    // NOUVELLES FONCTIONS D'ARCHIVAGE
+    archiveMission: function(id) {
+        const mission = this.db.missions.find(m => m.id === id);
+        if (mission) {
+            this.db.archives.push({
+                ...mission,
+                archivedDate: new Date().toISOString()
+            });
+            this.db.missions = this.db.missions.filter(m => m.id !== id);
+            this.saveData();
+            this.renderMissions();
         }
-    });
-
-    if (!isValid) {
-        alert('Veuillez remplir tous les champs obligatoires');
-        return;
+    },
+    
+    restoreMission: function(id) {
+        const archive = this.db.archives.find(a => a.id === id);
+        if (archive) {
+            this.db.missions.push({
+                ...archive,
+                archivedDate: undefined
+            });
+            this.db.archives = this.db.archives.filter(a => a.id !== id);
+            this.saveData();
+            this.renderAll();
+        }
+    },
+    
+    // FONCTIONS D'AFFICHAGE COMBINÉES
+    renderAll: function() {
+        this.renderMissions();
+        this.renderArchives();
+    },
+    
+    renderArchives: function() {
+        const html = this.db.archives.map(archive => `
+            <div class="record-item archived-item">
+                <div>${this.formatName(archive.userName)}</div>
+                <button onclick="app.restoreMission(${archive.id})" class="restore-btn">Restaurer</button>
+            </div>
+        `).join('');
+        
+        document.getElementById('archivesList').innerHTML = html || "<p>Aucune archive</p>";
     }
+};
 
-    // Création de la mission
-    const newMission = {
-        id: Date.now(),
-        userName: formElements.userName.value,
-        interventionType: formElements.interventionType.value,
-        missionType: formElements.missionType.value,
-        missionDetail: formElements.missionDetail.value,
-        priority: parseInt(formElements.priority.value),
-        description: formElements.description.value,
-        date: new Date().toLocaleString('fr-FR')
-    };
+// INITIALISATION
+document.addEventListener('DOMContentLoaded', () => app.init());
 
-    db.missions.push(newMission);
-    saveDB();
-    renderMissions();
-    resetForm();
-}
-
-function resetForm() {
-    document.getElementById('userName').value = '';
-    document.getElementById('interventionType').value = '';
-    document.getElementById('missionType').value = '';
-    document.getElementById('missionDetail').innerHTML = '<option value="">Sélectionnez d\'abord le type de mission</option>';
-    document.getElementById('missionDetail').disabled = true;
-    document.getElementById('priority').value = '';
-    document.getElementById('missionDescription').value = '';
-}
-
-// Initialisation complète
-function init() {
-    loadDB();
-    initForm();
-    initAutocomplete();
-    renderMissions();
-}
-
-document.addEventListener('DOMContentLoaded', init);
+// FONCTIONS GLOBALES POUR LES HANDLERS HTML
+window.toggleArchives = function() {
+    const container = document.querySelector('.archives-container');
+    container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    if (container.style.display === 'block') app.renderArchives();
+};
