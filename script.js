@@ -85,6 +85,7 @@ function renderRecords() {
                         `<button class="edit-btn" onclick="startEdit(${record.id})">Modifier</button>`
                     }
                     <button class="archive-btn" onclick="archiveRecord(${record.id})">Archiver</button>
+                    <button onclick="exportArchives()" class="export-btn">Exporter les archives</button>
                 </div>
             </div>
         `;
