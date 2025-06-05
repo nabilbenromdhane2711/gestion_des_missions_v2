@@ -27,15 +27,59 @@ const missionTypes = {
     purchase: "Achat",
     training: "Formation/Sensibilisation"
 };
-
+const app = {
+    // ... Vos autres fonctions existantes ...
+    
+    // AJOUTEZ ICI LA NOUVELLE FONCTION
+    exportArchives: function() {
+        if (this.db.archives.length === 0) {
+            alert("Aucune archive à exporter");
+            return;
+        };
+        const headers = ["ID", "Collaborateur", "Type", "Détail", "Date", "Description"];
+        const rows = this.db.archives.map(archive => [
+            archive.id,
+            archive.userName,
+            archive.missionTypeLabel,
+            archive.missionDetail,
+            archive.date,
+            archive.description.replace(/\n/g, ' ')
+        ]);
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.map(field => `"${field}"`).join(","))
+        ].join("\n");
 const missionDetails = {
     support: ["Helpdesk (Assistance)", "Assistance/Support", /* ... */],
     maintenance: ["Changement de disque dur", /* ... */],
     // ... (tous les autres détails)
     training: ["Formations utilisateurs", "Ateliers ou événements"]
 };
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `missions_archives_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        if (confirm("Voulez-vous supprimer les archives après export ?")) {
+            this.db.archives = [];
+            this.saveData();
+            this.renderArchives();
+        }
+    },
+
+    // ... (le reste de votre code) ...
+};
+
 
 // Fonctions
+
+// Fonction globale pour le bouton
+window.exportArchives = () => app.exportArchives();
+
 function formatCollaboratorName(name) {
     const parts = name.split(' ');
     if (parts.length >= 2) {
