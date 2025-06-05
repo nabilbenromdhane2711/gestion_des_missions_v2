@@ -2,34 +2,37 @@
 const db = {
     missions: [],
     archives: [],
+    users: ["Abdelkader BenHammouda", "Abderazak Houssaini", /* ... */ ],
     lastUpdate: new Date().toISOString()
 };
 
 // Initialisation
-document.addEventListener('DOMContentLoaded', function() {
+function init() {
     loadDB();
-    initForm();
+    setupEventListeners();
     renderMissions();
-});
+}
 
-// Gestion de la base de données
+// Gestion des données
+function loadDB() {
+    const compressed = localStorage.getItem('missionDB');
+    if (compressed) {
+        const decompressed = LZString.decompressFromUTF16(compressed);
+        if (decompressed) {
+            Object.assign(db, JSON.parse(decompressed));
+        }
+    }
+}
+
 function saveDB() {
     const compressed = LZString.compressToUTF16(JSON.stringify(db));
     localStorage.setItem('missionDB', compressed);
 }
 
-function loadDB() {
-    const compressed = localStorage.getItem('missionDB');
-    if (compressed) {
-        const data = JSON.parse(LZString.decompressFromUTF16(compressed));
-        Object.assign(db, data);
-    }
-}
-
 // Fonctions d'archivage
 function archiveMission(id) {
     const mission = db.missions.find(m => m.id === id);
-    if (mission && confirm("Archiver cette mission ?")) {
+    if (mission) {
         db.archives.push({
             ...mission,
             archivedDate: new Date().toISOString()
@@ -42,7 +45,7 @@ function archiveMission(id) {
 
 function restoreMission(id) {
     const archive = db.archives.find(a => a.id === id);
-    if (archive && confirm("Restaurer cette mission ?")) {
+    if (archive) {
         db.missions.push({
             ...archive,
             archivedDate: undefined
@@ -55,10 +58,15 @@ function restoreMission(id) {
 }
 
 // Affichage
-function toggleArchives() {
-    const container = document.querySelector('.archives-container');
-    container.style.display = container.style.display === 'none' ? 'block' : 'none';
-    if (container.style.display === 'block') renderArchives();
+function renderMissions() {
+    const recordsList = document.getElementById('recordsList');
+    recordsList.innerHTML = db.missions.length ? 
+        db.missions.map(mission => `
+            <div class="record-item" data-id="${mission.id}">
+                <!-- [Votre template de mission existant] -->
+                <button onclick="archiveMission(${mission.id})" class="archive-btn">Archiver</button>
+            </div>
+        `).join('') : '<p>Aucune mission active</p>';
 }
 
 function renderArchives() {
@@ -66,15 +74,12 @@ function renderArchives() {
     archivesList.innerHTML = db.archives.length ? 
         db.archives.map(archive => `
             <div class="record-item archived-item" data-id="${archive.id}">
-                <div class="mission-details">
-                    <span>${formatName(archive.userName)}</span> - ${archive.missionTypeLabel}
-                    <div class="problem-details">${archive.missionDetail}</div>
-                    <small>Archivé le ${new Date(archive.archivedDate).toLocaleString('fr-FR')}</small>
-                </div>
-                <button class="restore-btn" onclick="restoreMission(${archive.id})">Restaurer</button>
+                <!-- [Template similaire à renderMissions] -->
+                <button onclick="restoreMission(${archive.id})" class="restore-btn">Restaurer</button>
             </div>
         `).join('') : '<p>Aucune mission archivée</p>';
 }
 
-// [Vos autres fonctions existantes (renderMissions, initForm, etc.)]
-// Pensez à remplacer archiveRecord() par archiveMission()
+function toggleArchives() {
+    const container = document.querySelector('.archives-container');
+    container.style.display = container.style.display === '
