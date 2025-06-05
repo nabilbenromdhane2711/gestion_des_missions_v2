@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des missions</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+</head>
+<body>
+    <h1>Gestion des missions</h1>
+    
+    <div class="records-container">
+        <h2>Missions actives</h2>
+        <div id="recordsList"></div>
+    </div>
+
+    <div class="form-container">
+        <!-- [Votre formulaire existant inchangé] -->
+    </div>
+
+    <button onclick="toggleArchives()" class="view-archives-btn">Voir les archives</button>
+    
+    <div class="archives-container">
+        <h2>Archives <button onclick="toggleArchives()">Fermer</button></h2>
+        <div id="archivesList"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
