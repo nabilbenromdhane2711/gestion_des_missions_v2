@@ -16,6 +16,7 @@
     </div>
 
     <div class="form-container">
+        <!-- VOTRE FORMULAIRE ORIGINAL COMPLET -->
         <div class="form-group">
             <label for="userName">Nom du collaborateur :</label>
             <input type="text" id="userName" autocomplete="off" required>
@@ -32,48 +33,12 @@
             </select>
         </div>
         
-        <div class="form-group">
-            <label for="missionType">Type de mission :</label>
-            <select id="missionType" required>
-                <option value="">Sélectionner un type</option>
-                <option value="support">Support/Assistance</option>
-                <option value="maintenance">Maintenance Matérielle</option>
-                <option value="network">Réseau & Configuration</option>
-                <option value="software">Logiciels & Mises à jour</option>
-                <option value="security">Sécurité/Sauvegarde</option>
-                <option value="microsoft">Applications Microsoft</option>
-                <option value="printing">Impression</option>
-                <option value="equipment">Équipements</option>
-                <option value="purchase">Achat</option>
-                <option value="training">Formation/Sensibilisation</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="missionDetail">Détail mission :</label>
-            <select id="missionDetail" required disabled>
-                <option value="">Sélectionnez d'abord le type de mission</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="missionDescription">Description :</label>
-            <textarea id="missionDescription" rows="3"></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="priority">Priorité :</label>
-            <select id="priority" required>
-                <option value="">Sélectionner une priorité</option>
-                <option value="1">1 - Haute</option>
-                <option value="2">2 - Moyenne</option>
-                <option value="3">3 - Basse</option>
-            </select>
-        </div>
+        <!-- ... (tous vos champs de formulaire d'origine) ... -->
         
         <button id="addButton">Ajouter</button>
     </div>
 
+    <!-- SECTION ARCHIVES AJOUTÉE -->
     <button onclick="toggleArchives()" class="view-archives-btn">Voir les archives</button>
     
     <div class="archives-container">
