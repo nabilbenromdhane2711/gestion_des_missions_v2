@@ -16,7 +16,13 @@
     </div>
 
     <div class="form-container">
-        <!-- [Votre formulaire existant inchangé] -->
+        <div class="form-group">
+            <label for="userName">Nom du collaborateur :</label>
+            <input type="text" id="userName" autocomplete="off" required>
+            <div id="userNameAutocomplete" class="autocomplete-items"></div>
+        </div>
+        
+        <!-- [Le reste de votre formulaire existant] -->
     </div>
 
     <button onclick="toggleArchives()" class="view-archives-btn">Voir les archives</button>
