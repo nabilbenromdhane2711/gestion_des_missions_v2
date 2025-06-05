@@ -1,85 +1,93 @@
-// Base de données
-const db = {
-    missions: [],
-    archives: [],
-    users: ["Abdelkader BenHammouda", "Abderazak Houssaini", /* ... */ ],
-    lastUpdate: new Date().toISOString()
-};
+// Initialisation du formulaire
+function initForm() {
+    const missionTypeSelect = document.getElementById('missionType');
+    const missionDetailSelect = document.getElementById('missionDetail');
+    
+    missionTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        missionDetailSelect.innerHTML = '';
+        
+        if (!selectedType) {
+            missionDetailSelect.disabled = true;
+            missionDetailSelect.innerHTML = '<option value="">Sélectionnez d\'abord le type de mission</option>';
+            return;
+        }
+        
+        missionDetailSelect.disabled = false;
+        const details = getMissionDetails(selectedType);
+        
+        details.forEach(detail => {
+            const option = document.createElement('option');
+            option.value = detail;
+            option.textContent = detail;
+            missionDetailSelect.appendChild(option);
+        });
+    });
 
-// Initialisation
+    document.getElementById('addButton').addEventListener('click', addMission);
+}
+
+// Fonction pour ajouter une mission
+function addMission() {
+    const formElements = {
+        userName: document.getElementById('userName'),
+        interventionType: document.getElementById('interventionType'),
+        missionType: document.getElementById('missionType'),
+        missionDetail: document.getElementById('missionDetail'),
+        priority: document.getElementById('priority'),
+        description: document.getElementById('missionDescription')
+    };
+
+    // Validation
+    let isValid = true;
+    Object.values(formElements).forEach(el => {
+        if (el.required && !el.value) {
+            el.classList.add('error');
+            isValid = false;
+        } else {
+            el.classList.remove('error');
+        }
+    });
+
+    if (!isValid) {
+        alert('Veuillez remplir tous les champs obligatoires');
+        return;
+    }
+
+    // Création de la mission
+    const newMission = {
+        id: Date.now(),
+        userName: formElements.userName.value,
+        interventionType: formElements.interventionType.value,
+        missionType: formElements.missionType.value,
+        missionDetail: formElements.missionDetail.value,
+        priority: parseInt(formElements.priority.value),
+        description: formElements.description.value,
+        date: new Date().toLocaleString('fr-FR')
+    };
+
+    db.missions.push(newMission);
+    saveDB();
+    renderMissions();
+    resetForm();
+}
+
+function resetForm() {
+    document.getElementById('userName').value = '';
+    document.getElementById('interventionType').value = '';
+    document.getElementById('missionType').value = '';
+    document.getElementById('missionDetail').innerHTML = '<option value="">Sélectionnez d\'abord le type de mission</option>';
+    document.getElementById('missionDetail').disabled = true;
+    document.getElementById('priority').value = '';
+    document.getElementById('missionDescription').value = '';
+}
+
+// Initialisation complète
 function init() {
     loadDB();
-    setupEventListeners();
+    initForm();
+    initAutocomplete();
     renderMissions();
 }
 
-// Gestion des données
-function loadDB() {
-    const compressed = localStorage.getItem('missionDB');
-    if (compressed) {
-        const decompressed = LZString.decompressFromUTF16(compressed);
-        if (decompressed) {
-            Object.assign(db, JSON.parse(decompressed));
-        }
-    }
-}
-
-function saveDB() {
-    const compressed = LZString.compressToUTF16(JSON.stringify(db));
-    localStorage.setItem('missionDB', compressed);
-}
-
-// Fonctions d'archivage
-function archiveMission(id) {
-    const mission = db.missions.find(m => m.id === id);
-    if (mission) {
-        db.archives.push({
-            ...mission,
-            archivedDate: new Date().toISOString()
-        });
-        db.missions = db.missions.filter(m => m.id !== id);
-        saveDB();
-        renderMissions();
-    }
-}
-
-function restoreMission(id) {
-    const archive = db.archives.find(a => a.id === id);
-    if (archive) {
-        db.missions.push({
-            ...archive,
-            archivedDate: undefined
-        });
-        db.archives = db.archives.filter(a => a.id !== id);
-        saveDB();
-        renderMissions();
-        renderArchives();
-    }
-}
-
-// Affichage
-function renderMissions() {
-    const recordsList = document.getElementById('recordsList');
-    recordsList.innerHTML = db.missions.length ? 
-        db.missions.map(mission => `
-            <div class="record-item" data-id="${mission.id}">
-                <!-- [Votre template de mission existant] -->
-                <button onclick="archiveMission(${mission.id})" class="archive-btn">Archiver</button>
-            </div>
-        `).join('') : '<p>Aucune mission active</p>';
-}
-
-function renderArchives() {
-    const archivesList = document.getElementById('archivesList');
-    archivesList.innerHTML = db.archives.length ? 
-        db.archives.map(archive => `
-            <div class="record-item archived-item" data-id="${archive.id}">
-                <!-- [Template similaire à renderMissions] -->
-                <button onclick="restoreMission(${archive.id})" class="restore-btn">Restaurer</button>
-            </div>
-        `).join('') : '<p>Aucune mission archivée</p>';
-}
-
-function toggleArchives() {
-    const container = document.querySelector('.archives-container');
-    container.style.display = container.style.display === '
+document.addEventListener('DOMContentLoaded', init);
