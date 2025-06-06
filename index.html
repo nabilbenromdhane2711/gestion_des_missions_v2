@@ -292,37 +292,319 @@
             const missionDetailSelect = document.getElementById('missionDetail');
             let records = [];
             let currentlyEditingId = null;
+            let currentFocus = -1;
             
             // Liste des collaborateurs
             const users = [
-                "Abdelkader BenHammouda", "Abderazak Houssaini", /* ... liste complète ... */ 
+                "Abdelkader BenHammouda", "Abderazak Houssaini", "Afef Karaani", "Ahlem Abdrabbou", 
+                "Ahlem Belgacem", "Ahlem Khmissi", "Ahmed Abdelatif", "Aicha Benromdhane", 
+                "Ali Touzri", "Alia Bensalah", "Amani Kassab", "Amel Chaaben", "Amel Ghodhban", 
+                "Amel Nasr", "Amira Chaieb", "Anis Khiari", "Asma Bouslah", "Awatef Arfaoui", 
+                "Aziza Abaza", "Azza Hrigua", "Basma Tlili", "Belgessem Khalil", "Besma Ghrairi", 
+                "Bouchra Boujemaa", "Bououd Jamila", "Chadia Chaabani", "Chadia Fares", 
+                "Chafiaa Tayari", "Chiraz Ouislati", "Chokri Elgharbi", "Chokri Othmani", 
+                "Dalila Cherni", "Ebtihel Guarbouj", "Emira Dhaouadi", "Emna Kasdalah", 
+                "Faiza Jridi", "Faouzia Daghfous", "Fathi Boudhiba", "Fathia Hammami", 
+                "Fathia Zarrouk", "Fatma Dalhem", "Fatma Mejri", "Faycel Bensalah", 
+                "Habiba Ben Ahmed", "Hadhami Belhadjamor", "Hajer Najar", "Hajer Obbi", 
+                "Hamadi Benchaabane", "Hamadi Khefifi", "Hamida Tayari", "Hana Massoudi", 
+                "Hanan Jlassi", "Hanan Benalhadj", "Hanen Benrhaiem", "Hanen Kaabar", 
+                "Hatem Karim", "Hayet Sghaier", "Hbib Jbeli", "Hbib Swihi", "Henda Naouara", 
+                "Henda Belarbi", "Henda Ounaissa", "Houda Khmir", "Imen Awedi", "Imen Chabbouh", 
+                "Imen Jazi", "Imen Sboui", "Ines Sghaier", "Intissar Tarhouni", "Intissar Benkhlifa", 
+                "Jalila Rahali", "Jamel Mhadhbi", "Jameledin Esghayer", "Jamila Bennasri", 
+                "Kalthoum Lbahri", "Karima Ferjani", "Khedija Gharsalli", "Khmaies Bouothman", 
+                "Kilani Benmabrouk", "Lamia Bengamra", "Lamya Majri", "Latifa Mokhtar", 
+                "Sonia Latrach", "Lilia Eljbali", "Lotfi Chaabani", "Lotfi Chouikha", 
+                "Maha Chemengui", "Maha Nefla", "Mahmoud Benhamda", "Majda Mansour", 
+                "Marwa Khalil", "Basma Medb", "Meriam Ferjani", "Moez Mami", 
+                "Mohamed Dababi", "Mohamed Kassabi", "Salima Mohamed", "Mohamed Belhadjali", 
+                "Mohamed Benabdellah", "Mohamed Boudkim", "Mohamed Saadi", "Mohamedmehdi Limam", 
+                "Mohamedsalah Charchari", "Monia Hammami", "Monkedh Belhajrhouma", "Mouaouia Mhamdi", 
+                "Moufida Elhamdi", "Mouna Bmabrouk", "Mouna Jaraya", "Mouna Abidi", 
+                "Mouna Benhassoun", "Mounira Marzouk", "Mourad Elaamouri", "Nabiha Benakil", 
+                "Nabil Benromdhane", "Nabila Berbouch", "Nabila Boukadida", "Nafaa Chtiba", 
+                "Najeh Meddeb", "Najet Abdia", "Najet Emhamed", "Najoua Merdassi", 
+                "Najwa Bensalha", "Najwa Filani", "Naziha Chtioui", "Naziha Mhadhbi", 
+                "Nedra Jabnoun", "Nooman Ben Hamada", "Noujoud Benamara", "Noura Gharsillaoui", 
+                "Nouria Mrabet", "Olfa Benhassine", "Rabeb Medeb", "Radhouane Hammami", 
+                "Raja Bahroun", "Raja Etoumi", "Ramzi Mathlouthi", "Riadh Trabellsi", 
+                "Ahlem Riahi", "Ridha Ayari", "Rihab Belhadjali", "Rihab Nafati", 
+                "Rim Harkafi", "Rim Medeb", "Sabah Rhimi", "Sabria Kharbech", 
+                "Salma Talmoudi", "Salwa Belhadjmabrouk", "Salwa Bennsib", "Salwa Hawri", 
+                "Samah Barboura", "Samah Bhajjla", "Samah Bouchouicha", "Samah Jouini", 
+                "Sameh Bahri", "Sameh Elaabdia", "Sami Jaziri", "Samia Bensalha", 
+                "Samira Zayadi", "Sana Benammar", "Sana Bengharbia", "Sana Zouari", 
+                "Sarra Benamor", "Sondes Majdoub", "Sonia Elaid", "Souhaila Rahouaj", 
+                "Soumaya Frouja", "Taief Zammel", "Takwa Turki", "Talel Ghozzi", 
+                "Taoufik Sahli", "Tarek Elasfour", "Teheni Fehri", "Thouraya Najar", 
+                "Tmayem Benkhedher", "Wafa Gobbar", "Walid Helel", "Wided Bendewed", 
+                "Yamina Bihaouiya", "Yosra Bellalouna", "Zohra Benhouia", "Zohra Bouaouina", 
                 "Zoubeir Sassi", "Zouhour Jazi"
             ].sort();
 
-            // Fonction pour formater l'affichage des noms
-            function formatCollaboratorName(name) {
-                const parts = name.split(' ');
-                if (parts.length >= 2) {
-                    const firstName = parts[0];
-                    const lastName = parts.slice(1).join(' ').toUpperCase();
-                    return `${firstName} ${lastName}`;
-                }
-                return name;
-            }
-
-            // Dictionnaires pour les types de mission (identique à votre version originale)
-            const missionTypes = { /* ... */ };
-            const missionDetails = { /* ... */ };
+            // Dictionnaires pour les missions
+            const missionTypes = {
+                support: "Support/Assistance",
+                maintenance: "Maintenance Matérielle",
+                network: "Réseau & Configuration",
+                software: "Logiciels & Mises à jour",
+                security: "Sécurité/Sauvegarde",
+                microsoft: "Applications Microsoft",
+                printing: "Impression",
+                equipment: "Équipements",
+                purchase: "Achat",
+                training: "Formation/Sensibilisation"
+            };
             
-            // Charger les enregistrements depuis le localStorage
+            const missionDetails = {
+                support: ["Helpdesk", "Assistance", "Dépannage", "Suivi AMEN"],
+                maintenance: ["Changement disque dur", "Ajout mémoire RAM"],
+                network: ["Configuration réseau", "Résolution connexion"],
+                software: ["Installation logiciels", "Mises à jour"],
+                security: ["Sauvegarde", "Gestion identifiants"],
+                microsoft: ["Office", "OneDrive"],
+                printing: ["Problème impression", "Installation pilotes"],
+                equipment: ["Fourniture équipement", "Installation"],
+                purchase: ["Commande matériel", "Suivi livraison"],
+                training: ["Formations", "Ateliers"]
+            };
+
+            // Charger les données
             if(localStorage.getItem('missionRecords')) {
                 records = JSON.parse(localStorage.getItem('missionRecords'));
                 renderRecords();
             }
+
+            // Autocomplétion fonctionnelle
+            userNameInput.addEventListener('input', function() {
+                const input = this.value.toLowerCase();
+                autocompleteContainer.innerHTML = '';
+                autocompleteContainer.style.display = 'none';
+                
+                if (input.length < 1) return;
+                
+                const matches = users.filter(user => 
+                    user.toLowerCase().includes(input)
+                ).slice(0, 5);
+                
+                if (matches.length === 0) return;
+                
+                autocompleteContainer.style.display = 'block';
+                
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    const startIdx = match.toLowerCase().indexOf(input);
+                    const endIdx = startIdx + input.length;
+                    item.innerHTML = match.substring(0, startIdx) + 
+                                   '<strong>' + match.substring(startIdx, endIdx) + '</strong>' + 
+                                   match.substring(endIdx);
+                    item.addEventListener('click', function() {
+                        userNameInput.value = match;
+                        autocompleteContainer.innerHTML = '';
+                        autocompleteContainer.style.display = 'none';
+                    });
+                    autocompleteContainer.appendChild(item);
+                });
+            });
+
+            // Navigation clavier dans l'autocomplétion
+            userNameInput.addEventListener('keydown', function(e) {
+                const items = autocompleteContainer.getElementsByTagName('div');
+                
+                if (e.key === 'ArrowDown') {
+                    currentFocus++;
+                    addActive(items);
+                } else if (e.key === 'ArrowUp') {
+                    currentFocus--;
+                    addActive(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentFocus > -1 && items[currentFocus]) {
+                        items[currentFocus].click();
+                    }
+                }
+            });
             
-            // [Toutes vos fonctions existantes: renderRecords(), changePriority(), etc...]
+            function addActive(items) {
+                if (!items || items.length === 0) return;
+                removeActive(items);
+                currentFocus = (currentFocus >= items.length) ? 0 : 
+                              (currentFocus < 0) ? items.length - 1 : currentFocus;
+                items[currentFocus].classList.add('autocomplete-active');
+            }
             
-            // Fonction pour exporter les missions archivées en CSV
+            function removeActive(items) {
+                for (let i = 0; i < items.length; i++) {
+                    items[i].classList.remove('autocomplete-active');
+                }
+            }
+
+            // Cacher l'autocomplétion quand on clique ailleurs
+            document.addEventListener('click', function(e) {
+                if (e.target !== userNameInput) {
+                    autocompleteContainer.style.display = 'none';
+                }
+            });
+
+            // Gestion des missions
+            missionTypeSelect.addEventListener('change', function() {
+                const selectedType = this.value;
+                missionDetailSelect.innerHTML = '';
+                
+                if (!selectedType) {
+                    missionDetailSelect.disabled = true;
+                    missionDetailSelect.innerHTML = '<option value="">Sélectionnez d\'abord le type de mission</option>';
+                    return;
+                }
+                
+                missionDetailSelect.disabled = false;
+                missionDetailSelect.innerHTML = '<option value="">Sélectionnez un détail</option>';
+                
+                missionDetails[selectedType].forEach(detail => {
+                    const option = document.createElement('option');
+                    option.value = detail;
+                    option.textContent = detail;
+                    missionDetailSelect.appendChild(option);
+                });
+            });
+            
+            addButton.addEventListener('click', function() {
+                const userName = userNameInput.value.trim();
+                const interventionType = document.getElementById('interventionType').value;
+                const missionType = document.getElementById('missionType').value;
+                const missionDetail = document.getElementById('missionDetail').value;
+                const priority = document.getElementById('priority').value;
+                const description = document.getElementById('missionDescription').value;
+                
+                if(userName && interventionType && missionType && missionDetail && priority) {
+                    if(!users.includes(userName)) {
+                        alert("Veuillez sélectionner un nom dans la liste.");
+                        return;
+                    }
+                    
+                    const newRecord = {
+                        id: Date.now(),
+                        userName: userName,
+                        interventionType: interventionType,
+                        missionType: missionType,
+                        missionTypeLabel: missionTypes[missionType],
+                        missionDetail: missionDetail,
+                        description: description,
+                        priority: parseInt(priority),
+                        date: new Date().toLocaleString('fr-FR'),
+                        archived: false
+                    };
+                    
+                    records.push(newRecord);
+                    localStorage.setItem('missionRecords', JSON.stringify(records));
+                    renderRecords();
+                    
+                    // Réinitialiser le formulaire
+                    userNameInput.value = '';
+                    document.getElementById('interventionType').value = '';
+                    document.getElementById('missionType').value = '';
+                    document.getElementById('missionDetail').innerHTML = '<option value="">Sélectionnez d\'abord le type de mission</option>';
+                    document.getElementById('missionDetail').disabled = true;
+                    document.getElementById('priority').value = '';
+                    document.getElementById('missionDescription').value = '';
+                } else {
+                    alert('Veuillez remplir tous les champs obligatoires.');
+                }
+            });
+            
+            function renderRecords() {
+                const activeRecords = records.filter(record => !record.archived);
+                
+                if(activeRecords.length === 0) {
+                    recordsList.innerHTML = '<p>Aucune mission enregistrée.</p>';
+                    return;
+                }
+                
+                activeRecords.sort((a, b) => a.priority - b.priority);
+                
+                let html = '';
+                activeRecords.forEach(record => {
+                    const priorityClass = `priority-${record.priority === 1 ? 'high' : record.priority === 2 ? 'medium' : 'low'}`;
+                    const interventionClass = `intervention-${record.interventionType}`;
+                    const interventionText = record.interventionType === 'remote' ? 'À distance' : 
+                                          record.interventionType === 'onsite' ? 'Sur place' : 'Les deux';
+                    const isEditing = currentlyEditingId === record.id;
+                    
+                    html += `
+                        <div class="record-item ${interventionClass}" data-id="${record.id}">
+                            <div class="mission-details">
+                                <span class="collaborator-name">${formatName(record.userName)}</span> - ${record.missionTypeLabel}
+                                <div class="problem-details">${record.missionDetail}</div>
+                                ${isEditing ? `<textarea class="edit-description">${record.description || ''}</textarea>` : 
+                                (record.description ? `<div class="description">${record.description}</div>` : '')}
+                                <small>${interventionText} • ${record.date}</small>
+                            </div>
+                            <div class="mission-actions">
+                                <div class="priority-controls">
+                                    <button class="priority-btn" onclick="changePriority(${record.id}, 'up')">↑</button>
+                                    <div class="priority-value ${priorityClass}">${record.priority}</div>
+                                    <button class="priority-btn" onclick="changePriority(${record.id}, 'down')">↓</button>
+                                </div>
+                                ${isEditing ? `<button class="edit-btn" onclick="saveEdit(${record.id})">Enregistrer</button>` : 
+                                `<button class="edit-btn" onclick="startEdit(${record.id})">Modifier</button>`}
+                                <button class="archive-btn" onclick="archiveRecord(${record.id})">Archiver</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                recordsList.innerHTML = html;
+            }
+            
+            function formatName(name) {
+                const parts = name.split(' ');
+                return parts.length >= 2 ? `${parts[0]} ${parts.slice(1).join(' ').toUpperCase()}` : name;
+            }
+
+            // Fonctions globales
+            window.changePriority = function(id, direction) {
+                const record = records.find(r => r.id === id);
+                if (!record) return;
+                
+                if (direction === 'up' && record.priority > 1) {
+                    record.priority--;
+                } else if (direction === 'down' && record.priority < 3) {
+                    record.priority++;
+                }
+                
+                localStorage.setItem('missionRecords', JSON.stringify(records));
+                renderRecords();
+            };
+            
+            window.archiveRecord = function(id) {
+                if(confirm("Archiver cette mission ?")) {
+                    const record = records.find(r => r.id === id);
+                    if (record) {
+                        record.archived = true;
+                        localStorage.setItem('missionRecords', JSON.stringify(records));
+                        renderRecords();
+                    }
+                }
+            };
+            
+            window.startEdit = function(id) {
+                currentlyEditingId = id;
+                renderRecords();
+            };
+            
+            window.saveEdit = function(id) {
+                const record = records.find(r => r.id === id);
+                if (record) {
+                    const textarea = document.querySelector(`[data-id="${id}"] .edit-description`);
+                    record.description = textarea.value;
+                    localStorage.setItem('missionRecords', JSON.stringify(records));
+                    currentlyEditingId = null;
+                    renderRecords();
+                }
+            };
+
+            // Export CSV
             document.getElementById('exportButton').addEventListener('click', function() {
                 const archivedRecords = records.filter(record => record.archived);
                 
@@ -331,48 +613,40 @@
                     return;
                 }
                 
-                let csvContent = "Nom collaborateur,Type intervention,Type mission,Détail mission,Description,Priorité,Date\n";
+                let csvContent = "Nom,Type intervention,Type mission,Détail,Description,Priorité,Date\n";
                 
                 archivedRecords.forEach(record => {
-                    csvContent += `"${record.userName}",`;
-                    csvContent += `"${record.interventionType === 'remote' ? 'À distance' : 
-                                  record.interventionType === 'onsite' ? 'Sur place' : 'Les deux'}",`;
-                    csvContent += `"${record.missionTypeLabel}",`;
-                    csvContent += `"${record.missionDetail}",`;
-                    csvContent += `"${record.description.replace(/"/g, '""')}",`;
-                    csvContent += `"${record.priority}",`;
-                    csvContent += `"${record.date}"\n`;
+                    csvContent += `"${record.userName}","${record.interventionType === 'remote' ? 'À distance' : 
+                                  record.interventionType === 'onsite' ? 'Sur place' : 'Les deux'}","${record.missionTypeLabel}","${record.missionDetail}","${(record.description || '').replace(/"/g, '""')}",${record.priority},"${record.date}"\n`;
                 });
                 
-                const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", `missions_archivees_${new Date().toISOString().slice(0,10)}.csv`);
-                document.body.appendChild(link);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `missions_archivees_${new Date().toISOString().slice(0, 10)}.csv`);
                 link.click();
-                document.body.removeChild(link);
             });
 
-            // Vider uniquement les archives
+            // Gestion des archives
             document.getElementById('clearArchives').addEventListener('click', function() {
                 const archivedCount = records.filter(r => r.archived).length;
                 
                 if (archivedCount === 0) {
-                    alert("Aucune mission archivée à supprimer.");
+                    alert("Aucune mission archivée.");
                     return;
                 }
                 
-                if (confirm(`Supprimer définitivement ${archivedCount} mission(s) archivée(s) ?`)) {
-                    records = records.filter(record => !record.archived);
+                if (confirm(`Supprimer ${archivedCount} mission(s) archivée(s) ?`)) {
+                    records = records.filter(r => !r.archived);
                     localStorage.setItem('missionRecords', JSON.stringify(records));
                     renderRecords();
-                    alert(`${archivedCount} mission(s) archivée(s) supprimée(s).`);
+                    alert(`${archivedCount} mission(s) supprimée(s).`);
                 }
             });
 
-            // Vider TOUTES les données
             document.getElementById('clearStorage').addEventListener('click', function() {
-                if (confirm("⚠️ Effacer TOUTES les missions (actives et archivées) ?")) {
+                if (confirm("Supprimer TOUTES les missions ?")) {
                     localStorage.clear();
                     records = [];
                     renderRecords();
