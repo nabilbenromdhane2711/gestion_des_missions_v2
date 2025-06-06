@@ -1,82 +1,32 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des missions</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Gestion des missions</h1>
+// Fonction pour exporter les missions archivées en CSV
+document.getElementById('exportButton').addEventListener('click', function() {
+    const archivedRecords = records.filter(record => record.archived);
     
-    <div class="records-container">
-        <h2>Liste des missions</h2>
-        <div id="recordsList">
-            <!-- Les enregistrements seront ajoutés ici dynamiquement -->
-        </div>
-    </div>
-
-    <div class="form-container">
-        <div class="form-group">
-            <label for="userName">Nom du collaborateur :</label>
-            <input type="text" id="userName" autocomplete="off" required>
-            <div id="userNameAutocomplete" class="autocomplete-items"></div>
-        </div>
-        
-        <div class="form-group">
-            <label for="interventionType">Type d'intervention :</label>
-            <select id="interventionType" required>
-                <option value="">Sélectionner un type</option>
-                <option value="remote">À distance</option>
-                <option value="onsite">Sur place</option>
-                <option value="onsite">Atelier UEFI </option>
-                <option value="both">Les deux</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="missionType">Type de mission :</label>
-            <select id="missionType" required>
-                <option value="">Sélectionner un type</option>
-                <option value="support">Support/Assistance</option>
-                <option value="maintenance">Maintenance Matérielle</option>
-                <option value="network">Réseau & Configuration</option>
-                <option value="software">Logiciels & Mises à jour</option>
-                <option value="security">Sécurité/Sauvegarde</option>
-                <option value="microsoft">Applications Microsoft</option>
-                <option value="printing">Impression</option>
-                <option value="equipment">Équipements</option>
-                <option value="purchase">Achat</option>
-                <option value="training">Formation/Sensibilisation</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="missionDetail">Détail mission :</label>
-            <select id="missionDetail" required disabled>
-                <option value="">Sélectionnez d'abord le type de mission</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="missionDescription">Description :</label>
-            <textarea id="missionDescription" rows="3"></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="priority">Priorité :</label>
-            <select id="priority" required>
-                <option value="">Sélectionner une priorité</option>
-                <option value="1">1 - Haute</option>
-                <option value="2">2 - Moyenne</option>
-                <option value="3">3 - Basse</option>
-            </select>
-        </div>
-        
-        <button id="addButton">Ajouter</button>
-        <button onclick="exportAndClearArchives()" class="export-btn">Exporter et supprimer les archives</button>
-    </div>
-
-    <script src="script.js" defer></script>
-</body>
-</html>
+    if (archivedRecords.length === 0) {
+        alert("Aucune mission archivée à exporter.");
+        return;
+    }
+    
+    // Créer le contenu CSV
+    let csvContent = "Nom collaborateur,Type intervention,Type mission,Détail mission,Description,Priorité,Date\n";
+    
+    archivedRecords.forEach(record => {
+        csvContent += `"${record.userName}",`;
+        csvContent += `"${record.interventionType === 'remote' ? 'À distance' : 
+                      record.interventionType === 'onsite' ? 'Sur place' : 'Les deux'}",`;
+        csvContent += `"${record.missionTypeLabel}",`;
+        csvContent += `"${record.missionDetail}",`;
+        csvContent += `"${record.description.replace(/"/g, '""')}",`;
+        csvContent += `"${record.priority}",`;
+        csvContent += `"${record.date}"\n`;
+    });
+    
+    // Créer un lien de téléchargement
+    const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `missions_archivees_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
